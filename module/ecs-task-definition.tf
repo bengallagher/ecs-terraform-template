@@ -1,12 +1,5 @@
-
-resource "aws_ecs_cluster" "this" {
-  name = var.module_id
-
-  depends_on = [ module.vpc ]
-}
-
 resource "aws_cloudwatch_log_group" "ecs_logs" {
-  name              = "/ecs/my-task-logs"
+  name              = "/ecs/${var.module_id}"
   retention_in_days = 1
 }
 
@@ -17,6 +10,11 @@ resource "aws_ecs_task_definition" "this" {
   cpu                      = "256"
   memory                   = "512"
   execution_role_arn       = aws_iam_role.ecs_execution_role.arn
+
+  runtime_platform {
+    operating_system_family = "LINUX"
+    cpu_architecture        = "X86_64"
+  }
 
   container_definitions = jsonencode([{
     name      = var.module_id
@@ -42,20 +40,3 @@ resource "aws_ecs_task_definition" "this" {
     }
   }])
 }
-
-resource "aws_ecs_service" "this" {
-  name                 = var.module_id
-  cluster              = aws_ecs_cluster.this.id
-  task_definition      = aws_ecs_task_definition.this.arn
-  launch_type          = "FARGATE"
-  desired_count        = 1
-  force_new_deployment = true
-
-  network_configuration {
-    subnets          = module.vpc.public_subnets
-    security_groups  = [module.vpc.default_security_group_id]
-    assign_public_ip = true
-  }
-}
-
-
