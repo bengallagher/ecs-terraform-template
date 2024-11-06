@@ -1,12 +1,16 @@
-variable "module_id" {
+variable "hosted_zone" {
   type        = string
-  description = "Deployment Identifier (used for resource naming)"
-  default     = "my-ecs"
+  description = "Hosted Zone ID"
 }
 
 variable "image" {
   type        = string
-  description = "Container Image Address (plus tag)"
+  description = "Container Image Address"
+}
+
+variable "image_tag" {
+  type        = string
+  description = "Container Image Tag"
 }
 
 variable "min_capacity" {
