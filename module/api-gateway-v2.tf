@@ -1,14 +1,39 @@
-resource "aws_security_group" "vpclink" {
+resource "aws_security_group" "vpc_link" {
   name_prefix = "${random_pet.this.id}-"
   description = "VPC API Gateway Link"
   vpc_id      = module.vpc.vpc_id
 
+  tags = {
+    Name = " VPC Link ${random_pet.this.id}"
+  }
+
   depends_on = [module.vpc]
+}
+
+# Enable all port 80 ingress traffic
+resource "aws_vpc_security_group_ingress_rule" "vpc_link_ingress" {
+  security_group_id = aws_security_group.vpc_link.id
+
+  cidr_ipv4   = "0.0.0.0/0"
+  to_port     = 80
+  from_port   = 80
+  ip_protocol = "tcp"
+
+  depends_on = [aws_security_group.vpc_link]
+}
+
+# Enable outbound traffic to ECS security group
+resource "aws_vpc_security_group_egress_rule" "vpc_link_egress" {
+  security_group_id = aws_security_group.vpc_link.id
+  referenced_security_group_id = aws_security_group.ecs.id
+  ip_protocol = "all"
+
+  depends_on = [aws_security_group.vpc_link]
 }
 
 resource "aws_apigatewayv2_vpc_link" "this" {
   name               = random_pet.this.id
-  security_group_ids = [aws_security_group.vpclink.id]
+  security_group_ids = [aws_security_group.vpc_link.id]
   subnet_ids         = module.vpc.public_subnets
 }
 
@@ -38,10 +63,10 @@ resource "aws_apigatewayv2_integration" "this" {
 }
 
 resource "aws_apigatewayv2_route" "this" {
-  api_id    = aws_apigatewayv2_api.this.id
+  api_id = aws_apigatewayv2_api.this.id
   # route_key = "$default"
   route_key = "ANY /{proxy+}"
-  target    = "integrations/${aws_apigatewayv2_integration.this.id}"
+  target    = join("/",["integrations", aws_apigatewayv2_integration.this.id])
 }
 
 resource "aws_apigatewayv2_domain_name" "this" {
