@@ -16,7 +16,7 @@ locals {
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
 
-  name = random_pet.this.id
+  name = local.service_id
   cidr = local.vpc_cidr
 
   azs            = local.azs

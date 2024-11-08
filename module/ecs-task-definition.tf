@@ -1,15 +1,16 @@
 resource "aws_cloudwatch_log_group" "ecs_logs" {
-  name              = "/ecs/${random_pet.this.id}"
+  name              = "/ecs/${local.service_id}/task"
   retention_in_days = 1
 }
 
 resource "aws_ecs_task_definition" "this" {
-  family                   = random_pet.this.id
+  family                   = local.service_id
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = "256"
   memory                   = "512"
-  execution_role_arn       = aws_iam_role.ecs_execution_role.arn
+  execution_role_arn       = aws_iam_role.ecs_exec_role.arn
+  task_role_arn            = aws_iam_role.ecs_task_role.arn
 
   runtime_platform {
     operating_system_family = "LINUX"
@@ -17,18 +18,21 @@ resource "aws_ecs_task_definition" "this" {
   }
 
   container_definitions = jsonencode([{
-    name      = random_pet.this.id
+    name      = local.service_id
     image     = join(":", [var.image, var.image_tag])
     essential = true
     portMappings = [
       {
+        name          = local.service_id
         containerPort = 80
-        hostPort      = 80
       }
     ]
     command = ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
     healthcheck = {
-      command  = ["CMD-SHELL", "curl --fail http://127.0.0.1:80/health || exit 1"]
+      command = [
+        "CMD-SHELL",
+        "curl --fail http://localhost/health || exit 1"
+      ]
       interval = 30
       timeout  = 5
       retries  = 3

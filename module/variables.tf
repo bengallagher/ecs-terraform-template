@@ -1,3 +1,9 @@
+variable "service_name" {
+  type        = string
+  description = "Service Name"
+  default = "demo"
+}
+
 variable "hosted_zone" {
   type        = string
   description = "Hosted Zone ID"
@@ -22,7 +28,13 @@ variable "min_capacity" {
 variable "max_capacity" {
   type        = number
   description = "Maximum Tasks"
-  default     = 3
+  default     = 10
+}
+
+variable "desired_capacity" {
+  type        = number
+  description = "Desired Tasks"
+  default     = 2
 }
 
 variable "scaling_threshold_cpu" {
@@ -34,7 +46,7 @@ variable "scaling_threshold_cpu" {
 variable "scaling_threshold_memory" {
   type        = number
   description = "% Memory scaling threshold"
-  default     = 80
+  default     = 60
 }
 
 variable "env_vars" {

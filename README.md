@@ -11,6 +11,8 @@ https://aws.amazon.com/blogs/architecture/field-notes-integrating-http-apis-with
 
 https://aws.amazon.com/blogs/architecture/field-notes-serverless-container-based-apis-with-amazon-ecs-and-amazon-api-gateway/
 
+https://github.com/aws-samples/aws-apigw-http-api-private--integrations/blob/main/templates/APIGW-HTTP-private-integration-AWS-Cloudmap-ecs.yml#L492
+
 # ToDos
 
 - add api gateway

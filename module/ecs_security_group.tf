@@ -1,10 +1,10 @@
 resource "aws_security_group" "ecs" {
-  name_prefix = "${random_pet.this.id}-"
+  name_prefix = "${local.service_id}-"
   description = "Allow traffic to/from ECS"
   vpc_id      = module.vpc.vpc_id
 
   tags = {
-    Name = "ECS Service ${random_pet.this.id}"
+    Name = "ECS Service ${local.service_id}"
   }
 
   depends_on = [module.vpc]

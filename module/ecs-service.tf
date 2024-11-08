@@ -1,9 +1,14 @@
+resource "aws_cloudwatch_log_group" "ecs_service_logs" {
+  name              = "/ecs/${local.service_id}/service"
+  retention_in_days = 1
+}
+
 resource "aws_ecs_service" "this" {
-  name            = random_pet.this.id
+  name            = local.service_id
   cluster         = aws_ecs_cluster.this.id
   task_definition = aws_ecs_task_definition.this.arn
   launch_type     = "FARGATE"
-  desired_count   = 1
+  desired_count   = var.desired_capacity
 
   # force deployment update on any terraform plan (useful for testing)
   force_new_deployment = true
@@ -23,9 +28,4 @@ resource "aws_ecs_service" "this" {
     registry_arn = aws_service_discovery_service.this.arn
     port         = 80
   }
-
-  # service_connect_configuration {
-  #   enabled = true
-  #   namespace = aws_service_discovery_private_dns_namespace.this.arn
-  # }
 }

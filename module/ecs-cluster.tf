@@ -1,5 +1,5 @@
 resource "aws_ecs_cluster" "this" {
-  name = random_pet.this.id
+  name = local.service_id
 
   depends_on = [module.vpc]
 }

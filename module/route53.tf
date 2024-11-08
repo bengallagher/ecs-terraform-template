@@ -6,7 +6,7 @@ data "aws_route53_zone" "this" {
 # create service record
 resource "aws_route53_record" "this" {
   zone_id = data.aws_route53_zone.this.zone_id
-  name    = "${random_pet.this.id}.${var.hosted_zone}"
+  name    = "${local.service_id}.${var.hosted_zone}"
   type    = "A"
   alias {
     name                   = aws_apigatewayv2_domain_name.this.domain_name_configuration[0].target_domain_name

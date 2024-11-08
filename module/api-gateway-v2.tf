@@ -1,10 +1,10 @@
 resource "aws_security_group" "vpc_link" {
-  name_prefix = "${random_pet.this.id}-"
+  name_prefix = "${local.service_id}-"
   description = "VPC API Gateway Link"
   vpc_id      = module.vpc.vpc_id
 
   tags = {
-    Name = " VPC Link ${random_pet.this.id}"
+    Name = " VPC Link ${local.service_id}"
   }
 
   depends_on = [module.vpc]
@@ -24,21 +24,21 @@ resource "aws_vpc_security_group_ingress_rule" "vpc_link_ingress" {
 
 # Enable outbound traffic to ECS security group
 resource "aws_vpc_security_group_egress_rule" "vpc_link_egress" {
-  security_group_id = aws_security_group.vpc_link.id
+  security_group_id            = aws_security_group.vpc_link.id
   referenced_security_group_id = aws_security_group.ecs.id
-  ip_protocol = "all"
+  ip_protocol                  = "all"
 
   depends_on = [aws_security_group.vpc_link]
 }
 
 resource "aws_apigatewayv2_vpc_link" "this" {
-  name               = random_pet.this.id
+  name               = local.service_id
   security_group_ids = [aws_security_group.vpc_link.id]
   subnet_ids         = module.vpc.public_subnets
 }
 
 resource "aws_apigatewayv2_api" "this" {
-  name          = random_pet.this.id
+  name          = local.service_id
   protocol_type = "HTTP"
 
   depends_on = [aws_apigatewayv2_vpc_link.this]
@@ -66,11 +66,11 @@ resource "aws_apigatewayv2_route" "this" {
   api_id = aws_apigatewayv2_api.this.id
   # route_key = "$default"
   route_key = "ANY /{proxy+}"
-  target    = join("/",["integrations", aws_apigatewayv2_integration.this.id])
+  target    = join("/", ["integrations", aws_apigatewayv2_integration.this.id])
 }
 
 resource "aws_apigatewayv2_domain_name" "this" {
-  domain_name = "${random_pet.this.id}.${var.hosted_zone}"
+  domain_name = "${local.service_id}.${var.hosted_zone}"
 
   domain_name_configuration {
     certificate_arn = aws_acm_certificate.this.arn
@@ -78,7 +78,10 @@ resource "aws_apigatewayv2_domain_name" "this" {
     security_policy = "TLS_1_2"
   }
 
-  depends_on = [aws_acm_certificate.this]
+  depends_on = [
+    aws_acm_certificate.this,
+    aws_acm_certificate_validation.this
+  ]
 }
 
 resource "aws_apigatewayv2_api_mapping" "this" {

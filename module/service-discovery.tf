@@ -1,11 +1,11 @@
 resource "aws_service_discovery_private_dns_namespace" "this" {
-  name        = "${random_pet.this.id}.local"
+  name        = local.service_id
   description = "Private DNS Namespace"
   vpc         = module.vpc.vpc_id
 }
 
 resource "aws_service_discovery_service" "this" {
-  name = random_pet.this.id
+  name = local.service_id
 
   dns_config {
     namespace_id = aws_service_discovery_private_dns_namespace.this.id
