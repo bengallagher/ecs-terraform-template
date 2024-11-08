@@ -22,7 +22,7 @@ variable "image_tag" {
 variable "min_capacity" {
   type        = number
   description = "Minimum Tasks"
-  default     = 1
+  default     = 2
 }
 
 variable "max_capacity" {
@@ -47,6 +47,12 @@ variable "scaling_threshold_memory" {
   type        = number
   description = "% Memory scaling threshold"
   default     = 60
+}
+
+variable "container_insights" {
+  type        = string
+  description = "Enable Container Insights"
+  default     = "disabled"
 }
 
 variable "env_vars" {
