@@ -26,6 +26,6 @@ resource "aws_ecs_service" "this" {
   # Ports and Container values should be set in the task definition
   service_registries {
     registry_arn = aws_service_discovery_service.this.arn
-    port         = 80
+    port         = var.container_port
   }
 }

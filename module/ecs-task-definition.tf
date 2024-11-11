@@ -24,10 +24,10 @@ resource "aws_ecs_task_definition" "this" {
     portMappings = [
       {
         name          = local.service_id
-        containerPort = 80
+        containerPort = var.container_port
       }
     ]
-    command = ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+    command = split(" ", var.container_startup_command)
     healthcheck = {
       command = [
         "CMD-SHELL",
